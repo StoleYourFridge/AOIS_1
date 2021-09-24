@@ -10,7 +10,7 @@ const int Size = 32;
 class MyNumber
 {
 private:
-    bool positive = true;
+    bool positive;
     vector<int>straight;
     vector<int>reverse;
     vector<int>additional;
@@ -20,10 +20,12 @@ public:
     void print();
 };
 
-MyNumber::MyNumber(int number)
+MyNumber::MyNumber(int number) : positive(true)
 {
-    if (number < 0) positive = false;
-    number = abs(number);
+    if (number < 0) {
+        positive = false;
+        number = abs(number);
+    }
     while (true)
     {
         if (number != 1) straight.insert(straight.begin(), number % 2);
@@ -91,7 +93,7 @@ void MyNumber::print()
 
 int main()
 {
-    MyNumber f(-12);
+    MyNumber f(-10);
     f.print();
     return 0;
 }
