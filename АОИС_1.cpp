@@ -3,9 +3,37 @@
 #include <cmath>
 #include <stack>
 
+
 using namespace std;
 
 const int Size = 32;
+
+void oneplus(vector<int>&additional)
+{
+    bool mind = true;
+    int i = additional.size() - 1;
+    while (mind)
+    {
+        if (additional[i] == 0)
+        {
+            additional[i] = 1;
+            mind = false;
+        }
+        else if (additional[i] == 1) {
+            additional[i] = 0;
+            i--;
+            if (i == -1) i = additional.size() - 1;
+        }
+    }
+}
+void vec_print(vector<int>term)
+{
+    for (int i = 0; i < term.size(); i++)
+    {
+        cout << term[i];
+    }
+    cout << endl;
+}
 
 class MyNumber
 {
@@ -18,6 +46,7 @@ private:
 public:
     MyNumber(int number);
     void print();
+    void summary_straight(MyNumber term, string comment);
 };
 
 MyNumber::MyNumber(int number) : positive(true)
@@ -54,46 +83,69 @@ MyNumber::MyNumber(int number) : positive(true)
             if (straight[i] == 1) additional[i] = reverse[i] = 0;
             else additional[i] = reverse[i] = 1;
         }
-        bool mind = true;
-        int i = 31;
-        while (mind)
-        {
-            if (additional[i] == 0)
-            {
-                additional[i] = 1;
-                mind = false;
-            }
-
-            else if (additional[i] == 1) {
-                additional[i] = 0;
-                i--;
-            }
-            if (i == -1) i = 31;
-        }
+        oneplus(additional);
     }
 }
 void MyNumber::print()
 {
     cout << "Straight :   ";
-    for (int i = 0; i < straight.size(); i++)
-    {
-        cout << straight[i];
-    }
+    vec_print(straight);
     cout << endl << "Reverse :    ";
-    for (int i = 0; i < reverse.size(); i++)
-    {
-        cout << reverse[i];
-    }
+    vec_print(reverse);
     cout << endl << "Additional : ";
-    for (int i = 0; i < additional.size(); i++)
+    vec_print(additional);
+}
+void MyNumber::summary_straight(MyNumber term, string comment)
+{   
+    vector<int>termone, termtwo;
+    if (comment == "straight") termone = straight, termtwo = term.straight;
+    else if (comment == "reverse") termone = reverse, termtwo = term.reverse;
+    else if (comment == "additional") termone = additional, termtwo = term.additional;
+    bool mind = false;
+    int i = straight.size() - 1;
+    vector<int>result;
+    while (i != -1)
     {
-        cout << additional[i];
+        if (!mind && termone[i] == 0 && termtwo[i] == 0)
+        {
+            result.insert(result.begin(), 0);
+        }
+        else if (!mind && (termone[i] == 1 && termtwo[i] == 0 || termone[i] == 0 && termtwo[i] == 1))
+        {
+            result.insert(result.begin(), 1);
+        }
+        else if (!mind && termone[i] == 1 && termtwo[i] == 1)
+        {
+            result.insert(result.begin(), 0);
+            mind = true;
+        }
+        else if (mind && termone[i] == 0 && termtwo[i] == 0)
+        {
+            result.insert(result.begin(), 1);
+            mind = false;
+        }
+        else if (mind && (termone[i] == 1 && termtwo[i] == 0 || termone[i] == 0 && termtwo[i] == 1))
+        {
+            result.insert(result.begin(), 0);
+        }
+        else if (mind && termone[i] == 1 && termtwo[i] == 1)
+        {
+            result.insert(result.begin(), 1);
+        }
+        i--;
     }
+    cout << "straight1 : ";
+    vec_print(straight); 
+    cout << "straight2 : ";
+    if (comment == "additional") oneplus(result);
+    vec_print(term.straight);
+    cout << "result :    ";
+    vec_print(result);
 }
 
 int main()
 {
-    MyNumber f(-10);
-    f.print();
+    MyNumber f(13), b(-4);
+    f.summary_straight(b, "straight");
     return 0;
 }
