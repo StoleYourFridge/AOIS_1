@@ -135,26 +135,30 @@ void MyNumber::print()
 void MyNumber::summary(MyNumber term)
 {   
     vector<int>result;
+    cout << "----------------------------------------------" << endl;
+    print();
+    cout << " + " << endl << endl;
+    term.print();
+    cout << "=" << endl << endl;
     if (summary_alg(reverse, term.reverse, result)) oneplus(result);
-    cout << "Reverse result    : ";
+    cout << "Reverse summary result    : ";
     vec_print(result);
     result.clear();
     summary_alg(additional, term.additional, result);
-    cout << "Additional result : ";
+    cout << "Additional summary result : ";
     vec_print(result);
     if (result[0]) {
         inversion(result);
         oneplus(result);
     }
-    cout << "Straight result   : ";
+    cout << "Straight summary result   : ";
     vec_print(result);
+    cout << "-----------------------------------------------" << endl;
 }
 
 int main()
 {
     MyNumber f(-100), b(23);
-    f.print();
-    b.print();
     f.summary(b);
     return 0;
 }
