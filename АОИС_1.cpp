@@ -77,7 +77,8 @@ void inversion(vector<int>&term)
 }
 
 class MyNumber
-{
+{ 
+    int number;
     bool positive;
     vector<int>straight;
     vector<int>reverse;
@@ -86,9 +87,10 @@ public:
     MyNumber(int number);
     void print();
     void summary(MyNumber term);
+    void difference(MyNumber term);
 };
 
-MyNumber::MyNumber(int number) : positive(true)
+MyNumber::MyNumber(int number) : positive(true), number(number)
 {
     if (number < 0) {
         positive = false;
@@ -137,7 +139,7 @@ void MyNumber::summary(MyNumber term)
     vector<int>result;
     cout << "----------------------------------------------" << endl;
     print();
-    cout << " + " << endl << endl;
+    cout << " +/- " << endl << endl;
     term.print();
     cout << "=" << endl << endl;
     if (summary_alg(reverse, term.reverse, result)) oneplus(result);
@@ -155,10 +157,16 @@ void MyNumber::summary(MyNumber term)
     vec_print(result);
     cout << "-----------------------------------------------" << endl;
 }
+void MyNumber::difference(MyNumber term)
+{
+    MyNumber exchange(-term.number);
+    summary(exchange);
+}
 
 int main()
 {
-    MyNumber f(-100), b(23);
+    MyNumber f(-100), b(-16);
     f.summary(b);
+    f.difference(b);
     return 0;
 }
