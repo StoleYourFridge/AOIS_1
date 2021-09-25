@@ -136,14 +136,17 @@ void MyNumber::summary(MyNumber term)
 {   
     vector<int>result;
     if (summary_alg(reverse, term.reverse, result)) oneplus(result);
-    if (result[0]) inversion(result);
+    cout << "Reverse result    : ";
     vec_print(result);
     result.clear();
     summary_alg(additional, term.additional, result);
+    cout << "Additional result : ";
+    vec_print(result);
     if (result[0]) {
         inversion(result);
         oneplus(result);
     }
+    cout << "Straight result   : ";
     vec_print(result);
 }
 
