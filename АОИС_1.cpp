@@ -1,8 +1,6 @@
 ﻿#include <iostream>
 #include <vector>
 #include <cmath>
-#include <stack>
-
 
 using namespace std;
 
@@ -34,19 +32,60 @@ void vec_print(vector<int>term)
     }
     cout << endl;
 }
+bool summary_alg(vector<int>termone, vector<int>termtwo, vector<int>&result)
+{
+    bool mind = false;
+    int i = termone.size() - 1;
+    while (i != -1)
+    {
+        if (!mind && termone[i] == 0 && termtwo[i] == 0)
+        {
+            result.insert(result.begin(), 0);
+        }
+        else if (!mind && (termone[i] == 1 && termtwo[i] == 0 || termone[i] == 0 && termtwo[i] == 1))
+        {
+            result.insert(result.begin(), 1);
+        }
+        else if (!mind && termone[i] == 1 && termtwo[i] == 1)
+        {
+            result.insert(result.begin(), 0);
+            mind = true;
+        }
+        else if (mind && termone[i] == 0 && termtwo[i] == 0)
+        {
+            result.insert(result.begin(), 1);
+            mind = false;
+        }
+        else if (mind && (termone[i] == 1 && termtwo[i] == 0 || termone[i] == 0 && termtwo[i] == 1))
+        {
+            result.insert(result.begin(), 0);
+        }
+        else if (mind && termone[i] == 1 && termtwo[i] == 1)
+        {
+            result.insert(result.begin(), 1);
+        }
+        i--;
+    }
+    return mind;
+}
+void inversion(vector<int>&term)
+{
+    for (size_t i = 1; i < term.size(); i++)
+    {
+        term[i] = abs(term[i] - 1);
+    }
+}
 
 class MyNumber
 {
-private:
     bool positive;
     vector<int>straight;
     vector<int>reverse;
     vector<int>additional;
-
 public:
     MyNumber(int number);
     void print();
-    void summary_straight(MyNumber term, string comment);
+    void summary(MyNumber term);
 };
 
 MyNumber::MyNumber(int number) : positive(true)
@@ -78,11 +117,8 @@ MyNumber::MyNumber(int number) : positive(true)
         straight.insert(straight.begin(), 1);
         reverse = straight;
         additional = straight;
-        for (int i = 1; i < straight.size(); i++)
-        {
-            if (straight[i] == 1) additional[i] = reverse[i] = 0;
-            else additional[i] = reverse[i] = 1;
-        }
+        inversion(reverse);
+        inversion(additional);
         oneplus(additional);
     }
 }
@@ -90,62 +126,32 @@ void MyNumber::print()
 {
     cout << "Straight :   ";
     vec_print(straight);
-    cout << endl << "Reverse :    ";
+    cout << "Reverse :    ";
     vec_print(reverse);
-    cout << endl << "Additional : ";
+    cout << "Additional : ";
     vec_print(additional);
+    cout << endl;
 }
-void MyNumber::summary_straight(MyNumber term, string comment)
+void MyNumber::summary(MyNumber term)
 {   
-    vector<int>termone, termtwo;
-    if (comment == "straight") termone = straight, termtwo = term.straight;
-    else if (comment == "reverse") termone = reverse, termtwo = term.reverse;
-    else if (comment == "additional") termone = additional, termtwo = term.additional;
-    bool mind = false;
-    int i = straight.size() - 1;
     vector<int>result;
-    while (i != -1)
-    {
-        if (!mind && termone[i] == 0 && termtwo[i] == 0)
-        {
-            result.insert(result.begin(), 0);
-        }
-        else if (!mind && (termone[i] == 1 && termtwo[i] == 0 || termone[i] == 0 && termtwo[i] == 1))
-        {
-            result.insert(result.begin(), 1);
-        }
-        else if (!mind && termone[i] == 1 && termtwo[i] == 1)
-        {
-            result.insert(result.begin(), 0);
-            mind = true;
-        }
-        else if (mind && termone[i] == 0 && termtwo[i] == 0)
-        {
-            result.insert(result.begin(), 1);
-            mind = false;
-        }
-        else if (mind && (termone[i] == 1 && termtwo[i] == 0 || termone[i] == 0 && termtwo[i] == 1))
-        {
-            result.insert(result.begin(), 0);
-        }
-        else if (mind && termone[i] == 1 && termtwo[i] == 1)
-        {
-            result.insert(result.begin(), 1);
-        }
-        i--;
+    if (summary_alg(reverse, term.reverse, result)) oneplus(result);
+    if (result[0]) inversion(result);
+    vec_print(result);
+    result.clear();
+    summary_alg(additional, term.additional, result);
+    if (result[0]) {
+        inversion(result);
+        oneplus(result);
     }
-    cout << "straight1 : ";
-    vec_print(straight); 
-    cout << "straight2 : ";
-    if (comment == "additional") oneplus(result);
-    vec_print(term.straight);
-    cout << "result :    ";
     vec_print(result);
 }
 
 int main()
 {
-    MyNumber f(13), b(-4);
-    f.summary_straight(b, "straight");
+    MyNumber f(-100), b(23);
+    f.print();
+    b.print();
+    f.summary(b);
     return 0;
 }
