@@ -84,11 +84,15 @@ class MyNumber
     vector<int>reverse;
     vector<int>additional;
 public:
+    MyNumber();
     MyNumber(int number);
     void print();
     void summary_difference(MyNumber term);
+    friend MyNumber summary(int first, int second);
+    friend MyNumber difference(int first, int second);
 };
 
+MyNumber::MyNumber() {}
 MyNumber::MyNumber(int number) : positive(true), number(number)
 {
     if (number < 0) {
@@ -153,20 +157,24 @@ void MyNumber::summary_difference(MyNumber term)
     cout << "-----------------------------------------------" << endl;
 }
 
-void summary(int first, int second) //summary is ready
+MyNumber summary(int first, int second)
 {
-    MyNumber term1(first), term2(second);
-    term1.summary_difference(term2);
-}                         
-void difference(int first, int second) //difference is ready
-{
-    MyNumber term1(first), term2(-second);
-    term1.summary_difference(term2);
+    MyNumber term1(first), term2(second), result_obj;
+    vector<int>vec_result;
+    if (summary_alg(term1.reverse, term2.reverse, vec_result)) oneplus(vec_result);
+    result_obj.reverse = vec_result;
+    if (vec_result[0]) inversion(vec_result);
+    result_obj.straight = vec_result;
+    vec_result.clear();
+    summary_alg(term1.additional, term2.additional, vec_result);
+    result_obj.additional = vec_result;
+    cout << "Result : " << endl;
+    result_obj.print();
+    return result_obj;
 }
-void MyNumber::difference(MyNumber term)
+MyNumber difference(int first, int second)
 {
-    MyNumber exchange(-term.number);
-    summary(exchange);
+    return summary(first, -second);
 }
 
 
@@ -175,9 +183,9 @@ int main()
     int term1, term2;
     cout << "Enter term1 and term2 for operations : ";
     cin >> term1 >> term2;
-    cout << "Summary : " << term1 << " + " << term2 << " :" << endl;
+    cout << "Summary : " << endl;
     summary(term1, term2);
-    cout << "Difference : " << term1 << " - " << term2 << " :" << endl;
+    cout << "Difference : " << endl;
     difference(term1, term2);
     return 0;
 }
