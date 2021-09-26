@@ -86,8 +86,7 @@ class MyNumber
 public:
     MyNumber(int number);
     void print();
-    void summary(MyNumber term);
-    void difference(MyNumber term);
+    void summary_difference(MyNumber term);
 };
 
 MyNumber::MyNumber(int number) : positive(true), number(number)
@@ -126,36 +125,43 @@ MyNumber::MyNumber(int number) : positive(true), number(number)
 }
 void MyNumber::print()
 {
-    cout << "Straight :   ";
+    cout << "Straight   : ";
     vec_print(straight);
-    cout << "Reverse :    ";
+    cout << "Reverse    : ";
     vec_print(reverse);
     cout << "Additional : ";
     vec_print(additional);
     cout << endl;
 }
-void MyNumber::summary(MyNumber term)
+void MyNumber::summary_difference(MyNumber term)
 {   
     vector<int>result;
     cout << "----------------------------------------------" << endl;
     print();
-    cout << " +/- " << endl << endl;
     term.print();
-    cout << "=" << endl << endl;
     if (summary_alg(reverse, term.reverse, result)) oneplus(result);
-    cout << "Reverse summary result    : ";
+    if (result[0]) inversion(result);
+    cout << "Straight result    : ";
+    vec_print(result);
+    if (result[0]) inversion(result); 
+    cout << "Reverse result     : ";
     vec_print(result);
     result.clear();
     summary_alg(additional, term.additional, result);
-    cout << "Additional summary result : ";
-    vec_print(result);
-    if (result[0]) {
-        inversion(result);
-        oneplus(result);
-    }
-    cout << "Straight summary result   : ";
+    cout << "Additional result  : ";
     vec_print(result);
     cout << "-----------------------------------------------" << endl;
+}
+
+void summary(int first, int second) //summary is ready
+{
+    MyNumber term1(first), term2(second);
+    term1.summary_difference(term2);
+}                         
+void difference(int first, int second) //difference is ready
+{
+    MyNumber term1(first), term2(-second);
+    term1.summary_difference(term2);
 }
 void MyNumber::difference(MyNumber term)
 {
@@ -163,10 +169,15 @@ void MyNumber::difference(MyNumber term)
     summary(exchange);
 }
 
+
 int main()
 {
-    MyNumber f(-100), b(-16);
-    f.summary(b);
-    f.difference(b);
+    int term1, term2;
+    cout << "Enter term1 and term2 for operations : ";
+    cin >> term1 >> term2;
+    cout << "Summary : " << term1 << " + " << term2 << " :" << endl;
+    summary(term1, term2);
+    cout << "Difference : " << term1 << " - " << term2 << " :" << endl;
+    difference(term1, term2);
     return 0;
 }
