@@ -68,6 +68,13 @@ bool summary_alg(vector<int>termone, vector<int>termtwo, vector<int>&result)
     }
     return mind;
 }
+bool sum_for_mult(vector<int>&result, vector<int>term)
+{
+    vector<int>exchange = result;
+    result.clear();
+    return (summary_alg(exchange, term, result));
+    
+}
 void inversion(vector<int>&term)
 {
     for (size_t i = 1; i < term.size(); i++)
@@ -80,6 +87,7 @@ class MyNumber
 { 
     int number;
     bool positive;
+    vector<int>binary;
     vector<int>straight;
     vector<int>reverse;
     vector<int>additional;
@@ -87,11 +95,10 @@ public:
     MyNumber();
     MyNumber(int number);
     void print();
-    void summary_difference(MyNumber term);
     friend MyNumber summary(int first, int second);
     friend MyNumber difference(int first, int second);
+    friend pair<vector<int>, bool> multiplication(int first, int second);
 };
-
 MyNumber::MyNumber() {}
 MyNumber::MyNumber(int number) : positive(true), number(number)
 {
@@ -101,9 +108,19 @@ MyNumber::MyNumber(int number) : positive(true), number(number)
     }
     while (true)
     {
-        if (number != 1) straight.insert(straight.begin(), number % 2);
+        if (!number)
+        {
+            straight.insert(straight.begin(), 0);
+            binary.insert(binary.begin(), 0);
+            break;
+        }
+        if (number != 1) {
+            straight.insert(straight.begin(), number % 2);
+            binary.insert(binary.begin(), number % 2);
+        }
         else {
             straight.insert(straight.begin(), 1);
+            binary.insert(binary.begin(), 1);
             break;
         }
         number /= 2;
@@ -129,6 +146,8 @@ MyNumber::MyNumber(int number) : positive(true), number(number)
 }
 void MyNumber::print()
 {
+    /*cout << "Binary     : ";
+    vec_print(binary);*/
     cout << "Straight   : ";
     vec_print(straight);
     cout << "Reverse    : ";
@@ -136,25 +155,6 @@ void MyNumber::print()
     cout << "Additional : ";
     vec_print(additional);
     cout << endl;
-}
-void MyNumber::summary_difference(MyNumber term)
-{   
-    vector<int>result;
-    cout << "----------------------------------------------" << endl;
-    print();
-    term.print();
-    if (summary_alg(reverse, term.reverse, result)) oneplus(result);
-    if (result[0]) inversion(result);
-    cout << "Straight result    : ";
-    vec_print(result);
-    if (result[0]) inversion(result); 
-    cout << "Reverse result     : ";
-    vec_print(result);
-    result.clear();
-    summary_alg(additional, term.additional, result);
-    cout << "Additional result  : ";
-    vec_print(result);
-    cout << "-----------------------------------------------" << endl;
 }
 
 MyNumber summary(int first, int second)
@@ -168,7 +168,6 @@ MyNumber summary(int first, int second)
     vec_result.clear();
     summary_alg(term1.additional, term2.additional, vec_result);
     result_obj.additional = vec_result;
-    cout << "Result : " << endl;
     result_obj.print();
     return result_obj;
 }
@@ -176,16 +175,48 @@ MyNumber difference(int first, int second)
 {
     return summary(first, -second);
 }
-
+pair<vector<int>,bool> multiplication(int first, int second)
+{
+    bool sign = true;
+    if ((first < 0 && second > 0) || (first > 0 && second < 0)) sign = false;
+    MyNumber term1(first), term2(second);
+    vector<int> result(term1.binary.size(), 0), term = term1.binary;
+    int expected = 0;
+    for (int i = term2.binary.size() - 1; i >= 0; i--)
+    {
+        if (term2.binary[i]) {
+            for (int i = 0; i < expected; i++)
+            {
+                result.insert(result.begin(), 0);
+            }
+            if (sum_for_mult(result, term)) {
+                result.insert(result.begin(), 1);
+                expected = 0;
+            }
+            else expected = 1;
+        }
+        else {
+            expected++;
+        }
+        term.push_back(0);
+    }
+    pair <vector<int>, bool> output(result, sign);
+    return output;
+}
 
 int main()
-{
+{   
     int term1, term2;
     cout << "Enter term1 and term2 for operations : ";
     cin >> term1 >> term2;
-    cout << "Summary : " << endl;
+    cout << endl << "Summary : " << endl;
     summary(term1, term2);
     cout << "Difference : " << endl;
     difference(term1, term2);
+    cout << "Multiplication : ";
+    pair<vector<int>, bool> out = multiplication(term1, term2);
+    if (out.second) cout << "Positive -> ";
+    else cout << "Negative -> ";
+    vec_print(out.first);
     return 0;
 }
