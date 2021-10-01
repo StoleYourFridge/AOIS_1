@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <vector>
 #include <cmath>
+#include <ctime>
 
 using namespace std;
 
@@ -82,6 +83,53 @@ void inversion(vector<int>&term)
         term[i] = abs(term[i] - 1);
     }
 }
+void difference_alg(vector<int>&term1, vector<int>term2)
+{
+    if (term1.size() > term2.size()) {
+        while (term2.size() != term1.size())
+        {
+            term2.insert(term2.begin(), 0);
+        }
+    }
+    vector<int>result;
+    for (int i = term1.size() - 1; i >= 0; i--)
+    {
+        if (term1[i] && term2[i]) result.insert(result.begin(), 0);
+        else if (term1[i] && !term2[i]) result.insert(result.begin(), 1);
+        else if(!term1[i] && !term2[i]) result.insert(result.begin(), 0);
+        else if (!term1[i] && term2[i]) {
+            result.insert(result.begin(), 1);
+            int nearpositive = i;
+            while (!term1[nearpositive])
+            {
+                term1[nearpositive] = 1;
+                nearpositive--;
+            }
+            term1[nearpositive] = 0;
+        }
+    }
+    while (result.size() > 0 && !result[0])
+    {
+        result.erase(result.begin());
+    }
+    term1 = result;
+}
+bool signchecker(vector<int>term1, vector<int>term2)
+{
+    if (term1.size() < term2.size()) return false;
+    else if (term1.size() > term2.size()) {
+        while (term2.size() != term1.size())
+        {
+            term2.insert(term2.begin(), 0);
+        }
+    }
+    for (int i = 0; i < term1.size(); i++)
+    {
+        if (!term1[i] && term2[i]) return false;
+        else if (term1[i] && !term2[i]) return true;
+    }
+    return true;
+}
 
 class MyNumber
 { 
@@ -92,14 +140,14 @@ class MyNumber
     vector<int>reverse;
     vector<int>additional;
 public:
-    MyNumber();
+    MyNumber() {};
     MyNumber(int number);
     void print();
     friend MyNumber summary(int first, int second);
     friend MyNumber difference(int first, int second);
     friend pair<vector<int>, bool> multiplication(int first, int second);
+    friend pair< pair<vector<int>, vector<int>>, bool> division(int first, int second);
 };
-MyNumber::MyNumber() {}
 MyNumber::MyNumber(int number) : positive(true), number(number)
 {
     if (number < 0) {
@@ -203,9 +251,96 @@ pair<vector<int>,bool> multiplication(int first, int second)
     pair <vector<int>, bool> output(result, sign);
     return output;
 }
+pair< pair<vector<int>, vector<int>>, bool> division(int first, int second)
+{
+    bool sign = true;
+    if ((first < 0 && second > 0) || (first > 0 && second < 0)) sign = false;
+    MyNumber term1(first), term2(second);
+    vector<int>prevpoint, afterpoint, term1clone;
+    int pointer = 0;
+    while (!(signchecker(term1clone, term2.binary)))
+    {
+        if (pointer < term1.binary.size()) {
+            term1clone.push_back(term1.binary[pointer]);
+            pointer++;
+        }
+        else if (pointer >= term1.binary.size())
+        {
+            if (!prevpoint.size()) {
+                prevpoint.push_back(0);
+                pointer++;
+            }
+            else  afterpoint.push_back(0);
+            term1clone.push_back(0);
+        }
+    }
+    while (afterpoint.size() < 5)
+    {
+        if (signchecker(term1clone, term2.binary))
+        {
+            if (pointer < term1.binary.size())
+            {
+                prevpoint.push_back(1);
+                difference_alg(term1clone, term2.binary);
+                term1clone.push_back(term1.binary[pointer]);
+                pointer++;
+            }
+            else if (pointer == term1.binary.size())
+            {
+                prevpoint.push_back(1);
+                difference_alg(term1clone, term2.binary);
+                if (!term1clone.size()) break;
+                else {
+                    pointer++;
+                    term1clone.push_back(0);
+                }
+            }
+            else if (pointer > term1.binary.size())
+            {
+                afterpoint.push_back(1);
+                difference_alg(term1clone, term2.binary);
+                if (!term1clone.size()) break;
+                else {
+                    term1clone.push_back(0);
+                }
+            }
+
+        }
+        else if (!(signchecker(term1clone, term2.binary)))
+        {
+            if (pointer < term1.binary.size()) {
+                prevpoint.push_back(0);
+                term1clone.push_back(term1.binary[pointer]);
+                pointer++;
+            }
+            else if (pointer == term1.binary.size())
+            {
+                prevpoint.push_back(0);
+                term1clone.push_back(0);
+                pointer++;
+            }
+            else if (pointer > term1.binary.size())
+            {
+                afterpoint.push_back(0);
+                term1clone.push_back(0);
+            }
+        }
+    }
+    cout << "Before point : ";
+    vec_print(prevpoint);
+    cout << "After point : ";
+    vec_print(afterpoint);
+    pair<vector<int>, vector<int>> number(prevpoint, afterpoint);
+    pair< pair<vector<int>, vector<int>>, bool> output(number, sign);
+    return output;
+}
+
+
+
+
 
 int main()
-{   
+{
     int term1, term2;
     cout << "Enter term1 and term2 for operations : ";
     cin >> term1 >> term2;
@@ -213,10 +348,16 @@ int main()
     summary(term1, term2);
     cout << "Difference : " << endl;
     difference(term1, term2);
-    cout << "Multiplication : ";
-    pair<vector<int>, bool> out = multiplication(term1, term2);
-    if (out.second) cout << "Positive -> ";
+    cout << "Multiplication : "  << endl;
+    pair<vector<int>, bool> multout = multiplication(term1, term2);
+    if (multout.second) cout << "Positive -> ";
     else cout << "Negative -> ";
-    vec_print(out.first);
-    return 0;
+    vec_print(multout.first);
+    cout << endl << "Division : "  <<  endl;
+    pair< pair<vector<int>, vector<int>>, bool> divout = division(term1, term2);
+    if (divout.second) cout << "Positive ^|^";
+    else cout << "Negative ^|^";
+    /*vector<int> a{0, 0, 0}, b{1, 1};
+    bool r =signchecker(a, b);
+    cout << r;*/
 }
