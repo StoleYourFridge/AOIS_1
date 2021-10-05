@@ -1,7 +1,4 @@
-﻿#include <iostream>
-#include <vector>
-#include <cmath>
-#include <ctime>
+﻿#include "АОИС _1.h"
 
 using namespace std;
 
@@ -130,26 +127,6 @@ bool signchecker(vector<int>first, vector<int>second)
     return true;
 }
 
-class MyNumber
-{ 
-    int number;
-    bool positive;
-    vector<int>binary;
-    vector<int>straight;
-    vector<int>reverse;
-    vector<int>additional;
-public:
-    MyNumber(){};
-    MyNumber(int number);
-    void print();
-    friend MyNumber summary(int first, int second);
-    friend MyNumber difference(int first, int second);
-    friend vector<int> multiplication(int first, int second);
-    friend pair<vector<int>, vector<int>>division(int first, int second);
-    
-    friend bool comparewithclass(MyNumber &Test, vector<int>&teststraight, vector<int>&testreverse, vector<int>&testadditional);
-
-};
 MyNumber::MyNumber(int number) : positive(true), number(number)
 {
     if (number < 0) {
@@ -1066,24 +1043,4 @@ int tests()
 }
 //////////////////////////////////////////////////////////////////
 
-void main()
-{
-    
-    /*
-    int term1, term2;
-    cout << "Enter term1 and term2 for operations : ";
-    cin >> term1 >> term2;
-    cout << endl << "Summary : " << endl;
-    summary(term1, term2).print();
-    cout << "Difference : " << endl;
-    difference(term1, term2).print();
-    cout << "Multiplication : "  << endl;
-    vector<int> multout = multiplication(term1, term2);
-    vec_print(multout);
-    cout << endl << "Division : "  <<  endl;
-    pair<vector<int>, vector<int>>divout = division(term1, term2);
-    vec_print(divout.first);
-    cout << ",";
-    vec_print(divout.second);*/
-    tests();     
-}
+
