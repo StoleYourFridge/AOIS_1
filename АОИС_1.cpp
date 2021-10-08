@@ -2,8 +2,18 @@
 
 using namespace std;
 
+const int after_point_size = 5;
 const int Size = 32;
 
+bool checker(string number)
+{
+    for (int i = 0; i < number.size(); i++)
+    {
+        if (number[i] != '1' && number[i] != '2' && number[i] != '3' && number[i] != '4' && number[i] != '5' && number[i] != '6' && number[i] != '7' && number[i] != '8' && number[i] != '9')
+            return false;
+    }
+    return true;
+}
 void oneplus(vector<int>&term)
 {
     bool mind = true;
@@ -127,31 +137,35 @@ bool signchecker(vector<int>first, vector<int>second)
     return true;
 }
 
+vector<int> digitization(int number)
+{
+    vector<int> result;
+    while (true)
+    {
+        if (!number)
+        {
+            result.insert(result.begin(), 0);
+            break;
+        }
+        if (number != 1) {
+            result.insert(result.begin(), number % 2);
+        }
+        else {
+            result.insert(result.begin(), 1);
+            break;
+        }
+        number /= 2;
+    }
+    return result;
+}
+
 MyNumber::MyNumber(int number) : positive(true), number(number)
 {
     if (number < 0) {
         positive = false;
         number = abs(number);
     }
-    while (true)
-    {
-        if (!number)
-        {
-            straight.insert(straight.begin(), 0);
-            binary.insert(binary.begin(), 0);
-            break;
-        }
-        if (number != 1) {
-            straight.insert(straight.begin(), number % 2);
-            binary.insert(binary.begin(), number % 2);
-        }
-        else {
-            straight.insert(straight.begin(), 1);
-            binary.insert(binary.begin(), 1);
-            break;
-        }
-        number /= 2;
-    }
+    straight = binary = digitization(number);
     int zeroamount = Size - straight.size() - 1;
     for (int i = 0; i < zeroamount; i++)
     {
@@ -234,6 +248,11 @@ vector<int> multiplication(int first, int second)
 }
 pair<vector<int>, vector<int>> division(int first, int second)
 {
+    if (!first) {
+        pair<vector<int>, vector<int>> result({ 0 }, { 0,0,0,0,0 });
+        return result;
+    }
+
     bool sign = true;
     if ((first < 0 && second > 0) || (first > 0 && second < 0)) sign = false;
     MyNumber first_term(first), second_term(second);
@@ -255,7 +274,7 @@ pair<vector<int>, vector<int>> division(int first, int second)
             first_term_clone.push_back(0);
         }
     }
-    while (afterpoint.size() < 5)
+    while (afterpoint.size() < after_point_size)
     {
         if (signchecker(first_term_clone, second_term.binary))
         {
@@ -319,6 +338,37 @@ pair<vector<int>, vector<int>> division(int first, int second)
     else beforepoint.insert(beforepoint.begin(), 1);
     pair<vector<int>, vector<int>>output(beforepoint, afterpoint);
     return output;
+}
+pair<vector<int>, vector<int>> summary_floating_point(int first, int second)
+{
+    first = abs(first);
+    second = abs(second);
+    MyNumber first_term(first), second_term(second);
+    pair<vector<int>, int> pair_one(first_term.binary, first_term.binary.size()), pair_two(second_term.binary, second_term.binary.size());
+    while (pair_one.first.size() != pair_two.first.size())
+    {
+        if (pair_one.first.size() < pair_two.first.size()) pair_one.first.push_back(0);
+        else pair_two.first.push_back(0);
+    }
+    while (pair_one.second != pair_two.second)
+    {
+        if (pair_one.second < pair_two.second) {
+            pair_one.first.insert(pair_one.first.begin(), 0);
+            pair_one.first.erase(pair_one.first.begin() + (pair_one.first.size() -  1));
+            pair_one.second++;
+        }
+        else {
+            pair_two.first.insert(pair_two.first.begin(), 0);
+            pair_two.first.erase(pair_two.first.begin() + (pair_two.first.size() - 1));
+            pair_two.second++;
+        }
+    }
+    if (sum_for_mult(pair_one.first, pair_two.first)) {
+        pair_one.first.insert(pair_one.first.begin(), 1);
+        pair_one.second++;
+    }
+    pair<vector<int>, vector<int>> result(pair_one.first, digitization(pair_one.second));
+    return result;
 }
 
 
@@ -981,7 +1031,54 @@ bool Test53()
     cout << "Test 53 Incorrect!" << endl;
     return false;
 }
-
+bool Test54()
+{
+    vector<int>mant_test{ 1,0,0,1,0,0 };
+    vector<int>exp_test{ 1,1,0 };
+    pair<vector<int>, vector<int>> sample(mant_test, exp_test);
+    if (sample == summary_floating_point(22, 14)) {
+        cout << "Test 54 Correct!" << endl;
+        return true;
+    }
+    cout << "Test 54 Incorrect!" << endl;
+    return false;
+}
+bool Test55()
+{
+    vector<int>mant_test{ 1,0,0,1,0,0 };
+    vector<int>exp_test{ 1,1,0 };
+    pair<vector<int>, vector<int>> sample(mant_test, exp_test);
+    if (sample == summary_floating_point(14, 22)) {
+        cout << "Test 55 Correct!" << endl;
+        return true;
+    }
+    cout << "Test 55 Incorrect!" << endl;
+    return false;
+}
+bool Test56()
+{
+    vector<int>mant_test{ 1,0,0,1,0,1,0,1,0,0,0 };
+    vector<int>exp_test{ 1,0,1,1 };
+    pair<vector<int>, vector<int>> sample(mant_test, exp_test);
+    if (sample == summary_floating_point(1114, 78)) {
+        cout << "Test 56 Correct!" << endl;
+        return true;
+    }
+    cout << "Test 56 Incorrect!" << endl;
+    return false;
+}
+bool Test57()
+{
+    vector<int>mant_test{ 1,1,0,1,0,1,1,1,0,1,1 };
+    vector<int>exp_test{ 1,0,1,1 };
+    pair<vector<int>, vector<int>> sample(mant_test, exp_test);
+    if (sample == summary_floating_point(45, 1678)) {
+        cout << "Test 57 Correct!" << endl;
+        return true;
+    }
+    cout << "Test 57 Incorrect!" << endl;
+    return false;
+}
 int tests()
 {
     int correctcounter = 0;
@@ -1038,8 +1135,52 @@ int tests()
     correctcounter += Test51();
     correctcounter += Test52();
     correctcounter += Test53();
+    correctcounter += Test54();
+    correctcounter += Test55();
+    correctcounter += Test56();
+    correctcounter += Test57();
     cout << "Tests passed : " << correctcounter << endl;
     return correctcounter;
+}
+
+void own_example ()
+{
+    cout << "Enter term1 and term2 for operations : ";
+    string term_one, term_two;
+    cin.ignore();
+    getline(cin, term_one);
+    getline(cin, term_two);
+    if (!checker(term_one)) {
+        cout << "Enter something possible to work with" << endl;
+        return;
+    }
+    if (!checker(term_two)) {
+        cout << "Enter something possible to work with" << endl;
+        return;
+    }
+    int term1 =  stoi(term_one), term2 = stoi(term_two);
+    cout << endl << "Summary : " << endl;
+    summary(term1, term2).print();
+    cout << "Difference : " << endl;
+    difference(term1, term2).print();
+    cout << "Multiplication : " << endl;
+    vector<int> multout = multiplication(term1, term2);
+    vec_print(multout);
+    cout << endl << endl << "Division : " << endl;
+    if (!term2) cout << "Error!" << endl;
+    else {
+        pair<vector<int>, vector<int>>divout = division(term1, term2);
+        vec_print(divout.first);
+        cout << ",";
+        vec_print(divout.second);
+    }
+    cout << endl << endl << "Floating point summary : " << endl;
+    pair<vector<int>, vector<int>> sumout = summary_floating_point(term1, term2);
+    cout << "0,";
+    vec_print(sumout.first);
+    cout << "*2^";
+    vec_print(sumout.second);
+    cout << endl;
 }
 //////////////////////////////////////////////////////////////////
 

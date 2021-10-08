@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <string>
 #include <cmath>
 #include <vector>
 #include <ctime>
@@ -22,6 +23,7 @@ public:
     friend MyNumber difference(int first, int second);
     friend vector<int> multiplication(int first, int second);
     friend pair<vector<int>, vector<int>>division(int first, int second);
+    friend pair<vector<int>, vector<int>> summary_floating_point(int first, int second);
 
     friend bool comparewithclass(MyNumber& Test, vector<int>& teststraight, vector<int>& testreverse, vector<int>& testadditional);
 };
@@ -33,11 +35,13 @@ bool sum_for_mult(vector<int>& result, vector<int>term);
 void inversion(vector<int>& term);
 void difference_alg(vector<int>& first, vector<int>second);
 bool signchecker(vector<int>first, vector<int>second);
+vector<int> digitization(int number);
 
 MyNumber summary(int first, int second);
 MyNumber difference(int first, int second);
 vector<int> multiplication(int first, int second);
 pair<vector<int>, vector<int>> division(int first, int second);
+pair<vector<int>, vector<int>> summary_floating_point(int first, int second);
 
 bool comparewithclass(MyNumber& Test, vector<int>& teststraight, vector<int>& testreverse, vector<int>& testadditional);
 bool Test1();
@@ -93,4 +97,9 @@ bool Test50();
 bool Test51();
 bool Test52();
 bool Test53();
+bool Test54();
+bool Test55();
+bool Test56();
+bool Test57();
 int tests();
+void own_example();
